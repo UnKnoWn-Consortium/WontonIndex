@@ -159,7 +159,6 @@ input[type=text], input[type=number] {
 	display: inline-block; 
 	padding-bottom: 20px; 
 	position: absolute; 
-	top: 10px; 
 	right: 90px; 
 }
 .content .image fieldset.info , .content .image fieldset.userInfo {

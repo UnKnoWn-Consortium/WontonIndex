@@ -1,9 +1,6 @@
 <?php
-	$dbName = "wontonindex";
-	$dbUsername = "wontonindex";
-	$dbPassword = "aeUFzn3wJ9E5ZMcX";
-	$reCAPTCHA_key = "6LfAyAQTAAAAANiFD6eBBLtP6xdQ9uLhH3od0TAW";
-
+	require 'settings.php';
+	
 	$requestIP = $_SERVER['REMOTE_ADDR']; 
 	$time = $_POST["time"]; 
 	$date = $_POST["date"]; 

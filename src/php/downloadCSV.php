@@ -1,7 +1,5 @@
 <?php
-    $dbName = "wontonindex";
-	$dbUsername = "wontonindex";
-	$dbPassword = "aeUFzn3wJ9E5ZMcX";
+    require 'settings.php';
 	
 	$db = new mysqli('localhost', $dbUsername, $dbPassword, $dbName);
 	if($db->connect_errno > 0){die('Unable to connect to database [' . $db->connect_error . ']');}
