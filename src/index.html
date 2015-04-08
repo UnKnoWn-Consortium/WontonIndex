@@ -233,7 +233,7 @@
 			postObj.imageURL = imageURL;
 			postObj.EXIF = JSON.stringify(imageEXIF);
 			$.ajax({
-				url: "script/script.php",
+				url: "php/upload.php",
 				method: "POST",
 				data: postObj,
 				success: function(msg){
