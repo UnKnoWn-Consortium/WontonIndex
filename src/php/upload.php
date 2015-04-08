@@ -1,15 +1,16 @@
 <?php
-	$dbName = "";
-	$dbUsername = "";
-	$dbPassword = "";
-	$reCAPTCHA_key = "";
+	$dbName = "wontonindex";
+	$dbUsername = "wontonindex";
+	$dbPassword = "aeUFzn3wJ9E5ZMcX";
+	$reCAPTCHA_key = "6LfAyAQTAAAAANiFD6eBBLtP6xdQ9uLhH3od0TAW";
 
 	$requestIP = $_SERVER['REMOTE_ADDR']; 
 	$time = $_POST["time"]; 
 	$date = $_POST["date"]; 
 	$reCAPTCHA = $_POST["reCAPTCHAres"]; 
 	$image = $_POST['imageURL']; 
-	$restaurantName = $_POST['restaurantName'];
+	$restaurantName = $_POST['restaurantName']; 
+	$address = $_POST['address']; 
 	$price = $_POST['price'];
 	$numWonton = $_POST['numWonton'];
 	$rating = $_POST['rating'];
@@ -40,8 +41,8 @@
 	$db = new mysqli('localhost', $dbUsername, $dbPassword, $dbName);
 	if($db->connect_errno > 0){die('Unable to connect to database [' . $db->connect_error . ']');}
 	$db->set_charset("utf8");  
-	$statement = $db->prepare("INSERT INTO `upload` (`uploaderIP`, `reCAPTCHApass`, `imageDate`, `imageTime`, `imagePath`, `EXIFmanufacturer`, `EXIFmodel`, `gpsLat`, `gpsLong`, `gpsAlt`, `gpsTimestamp`, `restaurantName`, `price`, `numWonton`, `rating`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); 
+	$statement = $db->prepare("INSERT INTO `upload` (`uploaderIP`, `reCAPTCHApass`, `imageDate`, `imageTime`, `imagePath`, `EXIFmanufacturer`, `EXIFmodel`, `gpsLat`, `gpsLong`, `gpsAlt`, `gpsTimestamp`, `restaurantName`, `address`, `price`, `numWonton`, `rating`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); 
 	if ($statement === false){die('prepare() failed: ' . htmlspecialchars($db->error));}
-	$statement->bind_param("sisssssssdssdii", $requestIP, $reCAPTCHApass, $date, $time, $path, $EXIFmanufacturer, $EXIFmodel, $EXIFlat, $EXIFlong, $EXIFalt, $EXIFtimestamp, $restaurantName, $price, $numWonton, $rating); 
+	$statement->bind_param("sisssssssdsssdii", $requestIP, $reCAPTCHApass, $date, $time, $path, $EXIFmanufacturer, $EXIFmodel, $EXIFlat, $EXIFlong, $EXIFalt, $EXIFtimestamp, $restaurantName, $address, $price, $numWonton, $rating); 
 	$statement->execute(); 
 ?>
