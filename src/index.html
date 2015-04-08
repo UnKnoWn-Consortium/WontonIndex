@@ -11,7 +11,21 @@
 </head>
 
 <body>
-  
+  <div class="overlay"></div>
+  <div class="box">
+   <div class="loading">
+     <img src="img/loading.gif" alt="loading">
+     <p>Uploading... Please wait...</p> 
+     <p lang="zh-HK">噏撈緊啦... 等等吓...</p>
+   </div>
+   <div class="done">
+     <img src="img/like.png" alt="like" style="width: 150px; height: 150px;">
+     <p>Upload successful. </p>
+     <p>Thanks for your support!</p>
+     <p lang="zh-HK">搞掂啦。多謝支持！</p>
+     <button class="reload">RELOAD</button>
+   </div>
+  </div>
   <div class="container">
     <div class="logo">‎
       <div class="text">
@@ -31,23 +45,23 @@
           <div style="display: table">
             <div class="row">
               <div lang="zh-HK" style="display: table-cell">日期 :&nbsp;</div>
-              <div style="display: table-cell"><input name="date" /></div>
+              <div style="display: table-cell"><input type="text" name="date" /></div>
             </div>
             <div class="row">
               <div lang="zh-HK" style="display: table-cell">時間 :&nbsp;</div>
-              <div style="display: table-cell"><input name="time" /></div>
+              <div style="display: table-cell"><input type="text" name="time" /></div>
             </div>
             <div class="row">
               <div style="display: table-cell">GPS Latitude :&nbsp;</div>
-              <div style="display: table-cell"><input name="lat" disabled /></div>
+              <div style="display: table-cell"><input type="text" name="lat" disabled /></div>
             </div>
             <div class="row">
               <div style="display: table-cell">GPS Longitude :&nbsp;</div>
-              <div style="display: table-cell"><input name="long" disabled /></div>
+              <div style="display: table-cell"><input type="text" name="long" disabled /></div>
             </div>
             <div class="row">
               <div style="display: table-cell">GPS Altitude :&nbsp;</div>
-              <div style="display: table-cell"><input name="alt" disabled /></div>
+              <div style="display: table-cell"><input type="text" name="alt" disabled /></div>
             </div>
           </div>
         </fieldset>
@@ -59,7 +73,7 @@
               <div style="display: table-cell"><input type="text" name="restaurantName" /></div>
             </div>
             <div class="row">
-              <div lang="zh-HK" style="display: table-cell">價格 HKD :&nbsp;</div>
+              <div lang="zh-HK" style="display: table-cell">價錢 :&nbsp;</div>
               <div style="display: table-cell"><input name="price" type="number" min="1" /></div>
             </div>
             <div class="row">
@@ -67,8 +81,17 @@
               <div style="display: table-cell"><input name="numWonton" type="number" min="1" /></div>
             </div>
             <div class="row">
-              <div lang="zh-HK" style="display: table-cell">評價 :&nbsp;</div>
-              <div style="display: table-cell"><input name="rating" /></div>
+              <div lang="zh-HK" style="display: table-cell; vertical-align: middle; ">好唔好食 :&nbsp;</div>
+              <div style="display: table-cell">
+                <span class="star-cb-group">
+                  <input type="radio" id="rating-5" name="rating" value="5" /><label for="rating-5">5</label>
+                  <input type="radio" id="rating-4" name="rating" value="4" /><label for="rating-4">4</label>
+                  <input type="radio" id="rating-3" name="rating" value="3" /><label for="rating-3">3</label>
+                  <input type="radio" id="rating-2" name="rating" value="2" /><label for="rating-2">2</label>
+                  <input type="radio" id="rating-1" name="rating" value="1" /><label for="rating-1">1</label>
+                  <input type="radio" id="rating-0" name="rating" value="0" class="star-cb-clear" /><label for="rating-0">0</label>
+                </span>
+              </div>
             </div>
           </div>
         </fieldset>
@@ -85,7 +108,7 @@
     </div>
   </div>
   <div class="underlay">
-    <p>Coded by Thomas Sham</p>
+    <p>Coded by UnKnoWn</p>
   </div>
 <script>
     var canvas = document.getElementById('pusheen'), context = canvas.getContext("2d");
@@ -115,12 +138,27 @@
 			date: null,
 			reCAPTCHAres: null,
 			imageURL: null, 
-			EXIF: null
+			EXIF: null,
+			restaurantName: null,
+			price: null,
+			numWonton: null,
+			rating: null
 		},
 		pusheen = ["img/00.png", "img/01.png", "img/02.png", "img/03.png"];
-	function checkBOT (response){
-		reCAPTCHAres = response;
-		$(".submission button.submit").fadeIn(800, function(){$(".recaptcha").fadeOut(800);});
+	function checkEmpty(){
+		if ($("#dragandrophandler img").length == 0){
+			$(this).css('border', '2px dashed rgba(161,39,11,1)');
+			return true;
+		}else if ($("#dragandrophandler img").attr('src') !== undefined){return false;}
+	}
+	function checkBOT(response){
+		reCAPTCHAres = response; 
+		if (checkEmpty() !== false){
+			grecaptcha.reset();
+			$("#dragandrophandler, input[type=file]").css('border', '2px dashed rgba(161,39,11,1)').addClass('error'); 
+		}else{
+			$(".submission button.submit").fadeIn(800, function(){$(".recaptcha").fadeOut(800);});
+		}
 	}
 	function fileHandler(file){
 		if (acceptedTypes[file.type] === true){
@@ -130,75 +168,93 @@
 				imageURL = this.result;
 				image.src = imageURL; 
 				image.onload = function(){
-					if (image.height > image.width){image.height = 400;}else{image.width = 400;}
-					$("#dragandrophandler").html("").append(image);
-					$('.row input').val("");
-					imageEXIF.gps = null;
-					EXIF.getData(image, function(){
-						imageEXIF.manufacturer = EXIF.getTag(this, "Make"); 
-						imageEXIF.model = EXIF.getTag(this, "Model"); 
-						imageEXIF.timeCreated = EXIF.getTag(this, "DateTimeOriginal");
-						if (EXIF.getTag(this, "GPSLatitude") !== undefined){
-							gpsHolder.latitudeRef = EXIF.getTag(this, "GPSLatitudeRef");
-							gpsHolder.latitude = EXIF.getTag(this, "GPSLatitude");
-							gpsHolder.longitudeRef = EXIF.getTag(this, "GPSLongitudeRef");
-							gpsHolder.longitude = EXIF.getTag(this, "GPSLongitude");
-							gpsHolder.altitudeRef = EXIF.getTag(this, "GPSAltitudeRef");
-							gpsHolder.altitude = EXIF.getTag(this, "GPSAltitude");
-							gpsHolder.timeStamp = EXIF.getTag(this, "GPSTimeStamp");
-							imageEXIF.gps = gpsHolder;
-						}
-						if (imageEXIF.timeCreated !== undefined){
-							var dateTime = imageEXIF.timeCreated.split(" ");
-							$('input[name=date]').val(dateTime[0].replace(/:/g, "/")).prop('disabled', true); 
-							$('input[name=time]').val(dateTime[1]).prop('disabled', true); 
-						}else{
-							$('input[name=date]').val("").prop('disabled', false); 
-							$('input[name=time]').val("").prop('disabled', false); 
-						}
-						if (imageEXIF.gps !== null){
-							var latitude = imageEXIF.gps.latitudeRef + " " + imageEXIF.gps.latitude[0] + "º " + imageEXIF.gps.latitude[1] + "' " + imageEXIF.gps.latitude[2] + '"', 
-						       longitude = imageEXIF.gps.longitudeRef + " " + imageEXIF.gps.longitude[0] + "º " + imageEXIF.gps.longitude[1] + "' " + imageEXIF.gps.longitude[2] + '"', 
-						        altitude = imageEXIF.gps.altitudeRef + imageEXIF.gps.altitude; 
-							$('input[name=lat]').val(latitude).prop('disabled', true);; 
-							$('input[name=long]').val(longitude).prop('disabled', true);; 
-							$('input[name=alt]').val(altitude).prop('disabled', true);;
-						}
-					});
+					if ($("#dragandrophandler img").attr('src') !== imageURL){
+						grecaptcha.reset();
+						$('.submission button.submit').fadeOut(800, function(){$(".recaptcha").fadeIn(800);});
+						if (image.height > image.width){image.height = 400;}else{image.width = 400;}
+						$("#dragandrophandler").html("").append(image);
+						$('.info input').val("");
+						imageEXIF.gps = null;
+						EXIF.getData(image, function(){
+							imageEXIF.manufacturer = EXIF.getTag(this, "Make"); 
+							imageEXIF.model = EXIF.getTag(this, "Model"); 
+							imageEXIF.timeCreated = EXIF.getTag(this, "DateTimeOriginal");
+							if (EXIF.getTag(this, "GPSLatitude") !== undefined){
+								gpsHolder.latitudeRef = EXIF.getTag(this, "GPSLatitudeRef");
+								gpsHolder.latitude = EXIF.getTag(this, "GPSLatitude");
+								gpsHolder.longitudeRef = EXIF.getTag(this, "GPSLongitudeRef");
+								gpsHolder.longitude = EXIF.getTag(this, "GPSLongitude");
+								gpsHolder.altitudeRef = EXIF.getTag(this, "GPSAltitudeRef");
+								gpsHolder.altitude = EXIF.getTag(this, "GPSAltitude");
+								gpsHolder.timeStamp = EXIF.getTag(this, "GPSTimeStamp");
+								imageEXIF.gps = gpsHolder;
+							}
+							if (imageEXIF.timeCreated !== undefined){
+								var dateTime = imageEXIF.timeCreated.split(" ");
+								$('input[name=date]').val(dateTime[0].replace(/:/g, "/")).prop('disabled', true); 
+								$('input[name=time]').val(dateTime[1]).prop('disabled', true); 
+							}else{
+								$('input[name=date]').val("").prop('disabled', false); 
+								$('input[name=time]').val("").prop('disabled', false); 
+							}
+							if (imageEXIF.gps !== null){
+								var latitude = imageEXIF.gps.latitudeRef + " " + imageEXIF.gps.latitude[0] + "º " + imageEXIF.gps.latitude[1] + "' " + imageEXIF.gps.latitude[2] + '"', 
+						     	   longitude = imageEXIF.gps.longitudeRef + " " + imageEXIF.gps.longitude[0] + "º " + imageEXIF.gps.longitude[1] + "' " + imageEXIF.gps.longitude[2] + '"', 
+						        	altitude = imageEXIF.gps.altitudeRef + imageEXIF.gps.altitude; 
+								$('input[name=lat]').val(latitude).prop('disabled', true);; 
+								$('input[name=long]').val(longitude).prop('disabled', true);; 
+								$('input[name=alt]').val(altitude).prop('disabled', true);;
+							}
+						});
+					}
 				}
 			}
 			reader.readAsDataURL(file);
 		}else{
-			$("#dragandrophandler").innerHTML += '<p>Uploaded ' + file.name + ' ' + (file.size ? (file.size/1024|0) + 'K' : '');
+			
 			console.log(file);	
 		}
 	}
+	$('.userInfo').on('change', 'input', function(){
+		if ($(this).attr('name') == "rating"){postObj['rating'] = $(this).attr('value');}else{postObj[$(this).attr('name')] = $(this).val();}
+	});
+	$("button.reload").on('click', function(){
+		window.location.reload();
+	});
 	$('.submission button.submit').on('click', function(){
-		postObj.time = $('input[name=time]').val();
-		postObj.date = $('input[name=date]').val();
-		postObj.reCAPTCHAres = reCAPTCHAres;
-		postObj.imageURL = imageURL;
-		postObj.EXIF = JSON.stringify(imageEXIF);
-		$.ajax({
-			url: "script/script.php",
-			method: "POST",
-			data: postObj,
-			success: function(msg){
-				console.log(msg);
-			},
-			error: function(XHR, status){
-				console.log(status);
-			}
-		});
+		if (checkEmpty() === false){
+			$(".overlay").fadeIn(800, function(){
+				$(".box").fadeIn(800);
+				$(".loading").fadeIn(800);
+			});
+			postObj.time = $('input[name=time]').val();
+			postObj.date = $('input[name=date]').val();
+			postObj.reCAPTCHAres = reCAPTCHAres;
+			postObj.imageURL = imageURL;
+			postObj.EXIF = JSON.stringify(imageEXIF);
+			$.ajax({
+				url: "script/script.php",
+				method: "POST",
+				data: postObj,
+				success: function(msg){
+					setTimeout(function(){$(".loading").fadeOut(800, function(){$(".done").fadeIn(800);});}, 500);
+				},
+				error: function(XHR, status){
+					console.log(status);
+				}
+			});
+		}
 	});
 	$('input[id=cameraInput]').on('change', function(e){
 		file = $('input[id=cameraInput]')[0].files[0];
-		fileHandler(file);
+		$(this).css('border', '2px solid rgba(11,133,161,1)');
+		$("#dragandrophandler").css('border', '2px dashed rgba(11,133,161,1)');
+		fileHandler(file); 
 	});
 	$("#dragandrophandler").on('dragenter', function(e){
 		e.stopPropagation();
 		e.preventDefault();
-		$(this).css('border', '2px solid #0B85A1');
+		$(this).css('border', '2px solid rgba(11,133,161,1)');
 	});
 	$("#dragandrophandler").on('dragover', function(e){
 		e.stopPropagation();
@@ -206,6 +262,8 @@
 	});
 	$("#dragandrophandler").on('drop', function(e){
 		e.preventDefault();
+		$('input[id=cameraInput]').css('border', '2px dashed rgba(11,133,161,1)');
+		document.getElementById('cameraInput').value = '';
 		var files = e.originalEvent.dataTransfer.files;
 		fileHandler(files[0])
 	});
@@ -217,7 +275,7 @@
 		$(document).on('dragover', function(e){
 			e.stopPropagation();
 			e.preventDefault();
-			$("#dragandrophandler").css('border', '2px dotted #0B85A1');
+			$("#dragandrophandler").css('border', '2px dotted rgba(11,133,161,1)');
 		});
 		$(document).on('drop', function (e) {
 			e.stopPropagation();

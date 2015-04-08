@@ -1,6 +1,7 @@
 @charset "utf-8";
 [lang=zh-HK]{
 	font-family:'Microsoft JhengHei', 'Heiti TC', sans-serif; 
+	font-size: 20px;
 }
 body {
 	font-family: "Lato", "Verdana", "Arial", "Helvetica Neue", "Helvetica", sans-serif;
@@ -22,6 +23,61 @@ body {
 	min-width: 568px;
 	text-align: center;
 }
+.overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 999999;
+	background-color: #000;
+	opacity: 0.8;
+	background: -moz-radial-gradient(center,ellipse cover,rgba(0,0,0,0.4) 0,rgba(0,0,0,0.9) 100%);
+	background: -webkit-gradient(radial,center center,0px,center center,100%,color-stop(0%,rgba(0,0,0,0.4)),color-stop(100%,rgba(0,0,0,0.9)));
+	background: -webkit-radial-gradient(center,ellipse cover,rgba(0,0,0,0.4) 0,rgba(0,0,0,0.9) 100%);
+	background: -o-radial-gradient(center,ellipse cover,rgba(0,0,0,0.4) 0,rgba(0,0,0,0.9) 100%);
+	background: -ms-radial-gradient(center,ellipse cover,rgba(0,0,0,0.4) 0,rgba(0,0,0,0.9) 100%);
+	background: radial-gradient(center,ellipse cover,rgba(0,0,0,0.4) 0,rgba(0,0,0,0.9) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#66000000',endColorstr='#e6000000',GradientType=1);
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+	filter: alpha(opacity=50);
+    -webkit-transition: all 0.3s ease-out;
+       -moz-transition: all 0.3s ease-out;
+        -ms-transition: all 0.3s ease-out;
+         -o-transition: all 0.3s ease-out;
+            transition: all 0.3s ease-out;
+}
+.box {
+	display: none;
+	position: absolute;
+	width: 300px;
+	height: 300px;
+    top: 350px; 
+    left: 50%;
+	padding: 20px;
+    margin-left: -155px;
+    background-color: rgba(255,255,255,1);
+	border: solid 1px rgba(0,0,0,1);
+	-webkit-transition: top 0.5s ease-out, height 1s ease-out;
+       -moz-transition: top 0.5s ease-out, height 1s ease-out;
+        -ms-transition: top 0.5s ease-out, height 1s ease-out;
+         -o-transition: top 0.5s ease-out, height 1s ease-out;
+            transition: top 0.5s ease-out, height 1s ease-out;
+    border-radius: 8px;
+    text-align: center;
+    z-index: 9999999;
+}
+.loading, .done {
+	display: none;
+}
+.loading p, .done p {
+	font-size: 22px;
+	margin: 2px;
+}
+.loading p[lang=zh-HK], .done p[lang=zh-HK] {
+	margin-top: 5px;
+}
 .underlay p {
 	font-size: 16px;
 	font-weight: bold;
@@ -30,6 +86,10 @@ body {
 	margin-top: 10px;
 	text-align: center;
 	text-shadow: 1px 1px 1px rgba(111,125,148,1);
+}
+input[type=text], input[type=number] {
+	font-size: 20px;
+	width: 150px;
 }
 .logo {
 	background-image: url("../img/City_of_Victoria.jpg");
@@ -83,6 +143,7 @@ body {
 	height: 400px;
 	color: #92AAB0;
 	padding: 10px;
+	transition: ease-out 0.6s border;
 }
 .content .input #dragandrophandler span {
 	text-align: center; 
@@ -98,7 +159,7 @@ body {
 	display: inline-block; 
 	padding-bottom: 20px; 
 	position: absolute; 
-	top: 60px; 
+	top: 10px; 
 	right: 90px; 
 }
 .content .image fieldset.info , .content .image fieldset.userInfo {
@@ -135,13 +196,149 @@ body {
 	margin-right: auto;
 }
 .submission {
-	height: 50px;
+	height: 60px;
 	margin-left: auto;
 	margin-right: auto;
 	margin-bottom: 10px;
 }
-.submission button.submit {
+button.submit {
 	display: none;
+}
+button.reload {
+	margin-top: 8px;
+}
+button {
 	width: 150px;
-	height: 50px;
+	background-color: #27AE60;
+	border-radius: 4px;
+	font-size: 28px;
+	font-weight: bold;
+	color: rgba(238,238,238,1);
+	border: 0 none;
+	cursor: pointer;
+	padding: 10px 5px;
+}
+button:hover, button:focus {
+	box-shadow: 0 0 0 2px white, 0 0 0 3px rgba(39,174,96,1);
+}
+.star-cb-group {
+    font-size: 0;
+    unicode-bidi: bidi-override;
+    direction: rtl;
+}
+.star-cb-group * {
+    font-size: 1rem;
+}
+.star-cb-group > input {
+    display: none;
+}
+.star-cb-group > input + label {
+    display: inline-block;
+    overflow: hidden;
+    text-indent: 9999px;
+    width: 30px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.star-cb-group > input + label:before {
+    display: inline-block;
+    text-indent: -9999px;
+    content: "☆";
+    color: #888;
+    font-size: 30px;
+}
+.star-cb-group > input:checked ~ label:before, .star-cb-group > input + label:hover ~ label:before, .star-cb-group > input + label:hover:before {
+    content: "★";
+    color: #e52;
+    text-shadow: 0 0 1px #333;
+}
+.star-cb-group > .star-cb-clear + label {
+    text-indent: -9999px;
+    width: .5em;
+    margin-left: -.5em;
+}
+.star-cb-group > .star-cb-clear + label:before {
+    width: .5em;
+}
+.star-cb-group:hover > input + label:before {
+    content: "☆";
+    color: #888;
+    text-shadow: none;
+}
+.star-cb-group:hover > input + label:hover ~ label:before, .star-cb-group:hover > input + label:hover:before {
+    content: "★";
+    color: #e52;
+    text-shadow: 0 0 1px #333;
+}
+
+@-webkit-keyframes shake {
+	0% {-webkit-transform: translateX(20px);}
+	12.5% {-webkit-transform: translateX(-20px);}
+	25% {-webkit-transform: translateX(20px);}
+	37.5% {-webkit-transform: translateX(-20px);}
+	50% {-webkit-transform: translateX(20px);}
+	62.5% {-webkit-transform: translateX(-20px);}
+	75% {-webkit-transform: translateX(20px);}
+	87.5% {-webkit-transform: translateX(-20px);}
+	100% {-webkit-transform: translateX(20px);}
+}
+
+@-moz-keyframes shake {
+	0% {-moz-transform: translateX(20px);}
+	12.5% {-moz-transform: translateX(-20px);}
+	25% {-moz-transform: translateX(20px);}
+	37.5% {-moz-transform: translateX(-20px);}
+	50% {-moz-transform: translateX(20px);}
+	62.5% {-moz-transform: translateX(-20px);}
+	75% {-moz-transform: translateX(20px);}
+	87.5% {-moz-transform: translateX(-20px);}
+	100% {-moz-transform: translateX(20px);}
+}
+
+@-ms-keyframes shake {
+	0% {-ms-transform: translateX(20px);}
+	12.5% {-ms-transform: translateX(-20px);}
+	25% {-ms-transform: translateX(20px);}
+	37.5% {-ms-transform: translateX(-20px);}
+	50% {-ms-transform: translateX(20px);}
+	62.5% {-ms-transform: translateX(-20px);}
+	75% {-ms-transform: translateX(20px);}
+	87.5% {-ms-transform: translateX(-20px);}
+	100% {-ms-transform: translateX(20px);}
+}
+
+@-o-keyframes shake {
+	0% {-o-transform: translateX(20px);}
+	12.5% {-o-transform: translateX(-20px);}
+	25% {-o-transform: translateX(20px);}
+	37.5% {-o-transform: translateX(-20px);}
+	50% {-o-transform: translateX(20px);}
+	62.5% {-o-transform: translateX(-20px);}
+	75% {-o-transform: translateX(20px);}
+	87.5% {-o-transform: translateX(-20px);}
+	100% {-o-transform: translateX(20px);}
+}
+
+@keyframes shake {
+    0% {transform: translateX(20px);}
+	12.5% {transform: translateX(-20px);}
+	25% {transform: translateX(20px);}
+	37.5% {transform: translateX(-20px);}
+	50% {transform: translateX(20px);}
+	62.5% {transform: translateX(-20px);}
+	75% {transform: translateX(20px);}
+	87.5% {transform: translateX(-20px);}
+	100% {transform: translateX(20px);}
+}
+.error {
+	-webkit-animation-duration: 500ms;
+	-moz-animation-duration: 500ms;
+	-ms-animation-duration: 500ms;
+	-o-animation-duration: 500ms;
+	animation-duration: 500ms;
+	-webkit-animation-name: shake;
+	-moz-animation-name: shake;
+	-ms-animation-name: shake;
+	-o-animation-name: shake;
+    animation-name: shake;
 }
