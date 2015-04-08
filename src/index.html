@@ -242,7 +242,7 @@
 				method: "POST",
 				data: postObj,
 				success: function(msg){
-					setTimeout(function(){$(".loading").fadeOut(800, function(){$(".done").fadeIn(800);});}, 500);
+					setTimeout(function(){$(".loading").fadeOut(800, function(){$(".done").fadeIn(800);});}, 1000);
 				},
 				error: function(XHR, status){
 					console.log(status);
