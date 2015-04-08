@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Wonton Index Contributor</title>
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<link href='http://fonts.googleapis.com/css?family=Lato:400italic,400,900,900italic' rel='stylesheet' type='text/css' />
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<script type="text/javascript" src="script/exif.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+</head>
+
+<body>
+  
+  <div class="container">
+    <div class="logo">‎
+      <div class="text">
+        <h1>Wonton Index</h1>
+        <h1 lang="zh-HK">細蓉指數</h1>
+      </div>
+      <img alt="noodle" src="img/noodle.png">
+    </div>
+    <div class="content">
+      <div class="input">
+        <input type="file" accept="image/*" id="cameraInput" name="cameraInput">
+        <div id="dragandrophandler"><span>Drag & Drop Images Here</span></div>
+      </div>
+      <div class="image">
+        <fieldset class="info">
+          <legend>Image Info</legend>
+          <div style="display: table">
+            <div class="row">
+              <div lang="zh-HK" style="display: table-cell">日期 :&nbsp;</div>
+              <div style="display: table-cell"><input name="date" /></div>
+            </div>
+            <div class="row">
+              <div lang="zh-HK" style="display: table-cell">時間 :&nbsp;</div>
+              <div style="display: table-cell"><input name="time" /></div>
+            </div>
+            <div class="row">
+              <div style="display: table-cell">GPS Latitude :&nbsp;</div>
+              <div style="display: table-cell"><input name="lat" disabled /></div>
+            </div>
+            <div class="row">
+              <div style="display: table-cell">GPS Longitude :&nbsp;</div>
+              <div style="display: table-cell"><input name="long" disabled /></div>
+            </div>
+            <div class="row">
+              <div style="display: table-cell">GPS Altitude :&nbsp;</div>
+              <div style="display: table-cell"><input name="alt" disabled /></div>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset class="userInfo">
+          <legend>Additional Info</legend>
+          <div style="display: table">
+            <div class="row">
+              <div lang="zh-HK" style="display: table-cell">餐廳名 :&nbsp;</div>
+              <div style="display: table-cell"><input type="text" name="restaurantName" /></div>
+            </div>
+            <div class="row">
+              <div lang="zh-HK" style="display: table-cell">價格 HKD :&nbsp;</div>
+              <div style="display: table-cell"><input name="price" type="number" min="1" /></div>
+            </div>
+            <div class="row">
+              <div lang="zh-HK" style="display: table-cell">有幾多粒雲吞 :&nbsp;</div>
+              <div style="display: table-cell"><input name="numWonton" type="number" min="1" /></div>
+            </div>
+            <div class="row">
+              <div lang="zh-HK" style="display: table-cell">評價 :&nbsp;</div>
+              <div style="display: table-cell"><input name="rating" /></div>
+            </div>
+          </div>
+        </fieldset>
+        <div class="recaptcha">
+          <div class="g-recaptcha" data-sitekey="6LfAyAQTAAAAAOq5Sx7MvPTziRzIAtcPwToP5Rjj" data-callback="checkBOT"></div>
+        </div>
+      </div>
+      <div class="submission">
+        <button class="submit">SUBMIT</button>
+      </div>
+    </div>
+    <div class="footer">
+      <canvas id="pusheen" width="220" height="200"></canvas>
+    </div>
+  </div>
+  <div class="underlay">
+    <p>Coded by Thomas Sham</p>
+  </div>
+<script>
+    var canvas = document.getElementById('pusheen'), context = canvas.getContext("2d");
+	var imageURL, counter = 1, previousTime = null, reCAPTCHAres = null,
+	    acceptedTypes = {
+			'image/png': true,
+			'image/jpeg': true,
+			'image/gif': true
+		},
+		imageEXIF = {
+			manufacturer: null,
+			model: null,
+			timeCreated: null,
+			gps: null
+		},
+		gpsHolder = {
+			latitudeRef: null, 
+			latitude: null,
+			longitudeRef: null,
+			longitude: null,
+			altitudeRef: null,
+			altitude: null,
+			timeStamp: null
+		},
+		postObj = {
+			time: null,
+			date: null,
+			reCAPTCHAres: null,
+			imageURL: null, 
+			EXIF: null
+		},
+		pusheen = ["img/00.png", "img/01.png", "img/02.png", "img/03.png"];
+	function checkBOT (response){
+		reCAPTCHAres = response;
+		$(".submission button.submit").fadeIn(800, function(){$(".recaptcha").fadeOut(800);});
+	}
+	function fileHandler(file){
+		if (acceptedTypes[file.type] === true){
+			var reader = new FileReader();
+			reader.onload = function (event){
+				var image = new Image(); 
+				imageURL = this.result;
+				image.src = imageURL; 
+				image.onload = function(){
+					if (image.height > image.width){image.height = 400;}else{image.width = 400;}
+					$("#dragandrophandler").html("").append(image);
+					$('.row input').val("");
+					imageEXIF.gps = null;
+					EXIF.getData(image, function(){
+						imageEXIF.manufacturer = EXIF.getTag(this, "Make"); 
+						imageEXIF.model = EXIF.getTag(this, "Model"); 
+						imageEXIF.timeCreated = EXIF.getTag(this, "DateTimeOriginal");
+						if (EXIF.getTag(this, "GPSLatitude") !== undefined){
+							gpsHolder.latitudeRef = EXIF.getTag(this, "GPSLatitudeRef");
+							gpsHolder.latitude = EXIF.getTag(this, "GPSLatitude");
+							gpsHolder.longitudeRef = EXIF.getTag(this, "GPSLongitudeRef");
+							gpsHolder.longitude = EXIF.getTag(this, "GPSLongitude");
+							gpsHolder.altitudeRef = EXIF.getTag(this, "GPSAltitudeRef");
+							gpsHolder.altitude = EXIF.getTag(this, "GPSAltitude");
+							gpsHolder.timeStamp = EXIF.getTag(this, "GPSTimeStamp");
+							imageEXIF.gps = gpsHolder;
+						}
+						if (imageEXIF.timeCreated !== undefined){
+							var dateTime = imageEXIF.timeCreated.split(" ");
+							$('input[name=date]').val(dateTime[0].replace(/:/g, "/")).prop('disabled', true); 
+							$('input[name=time]').val(dateTime[1]).prop('disabled', true); 
+						}else{
+							$('input[name=date]').val("").prop('disabled', false); 
+							$('input[name=time]').val("").prop('disabled', false); 
+						}
+						if (imageEXIF.gps !== null){
+							var latitude = imageEXIF.gps.latitudeRef + " " + imageEXIF.gps.latitude[0] + "º " + imageEXIF.gps.latitude[1] + "' " + imageEXIF.gps.latitude[2] + '"', 
+						       longitude = imageEXIF.gps.longitudeRef + " " + imageEXIF.gps.longitude[0] + "º " + imageEXIF.gps.longitude[1] + "' " + imageEXIF.gps.longitude[2] + '"', 
+						        altitude = imageEXIF.gps.altitudeRef + imageEXIF.gps.altitude; 
+							$('input[name=lat]').val(latitude).prop('disabled', true);; 
+							$('input[name=long]').val(longitude).prop('disabled', true);; 
+							$('input[name=alt]').val(altitude).prop('disabled', true);;
+						}
+					});
+				}
+			}
+			reader.readAsDataURL(file);
+		}else{
+			$("#dragandrophandler").innerHTML += '<p>Uploaded ' + file.name + ' ' + (file.size ? (file.size/1024|0) + 'K' : '');
+			console.log(file);	
+		}
+	}
+	$('.submission button.submit').on('click', function(){
+		postObj.time = $('input[name=time]').val();
+		postObj.date = $('input[name=date]').val();
+		postObj.reCAPTCHAres = reCAPTCHAres;
+		postObj.imageURL = imageURL;
+		postObj.EXIF = JSON.stringify(imageEXIF);
+		$.ajax({
+			url: "script/script.php",
+			method: "POST",
+			data: postObj,
+			success: function(msg){
+				console.log(msg);
+			},
+			error: function(XHR, status){
+				console.log(status);
+			}
+		});
+	});
+	$('input[id=cameraInput]').on('change', function(e){
+		file = $('input[id=cameraInput]')[0].files[0];
+		fileHandler(file);
+	});
+	$("#dragandrophandler").on('dragenter', function(e){
+		e.stopPropagation();
+		e.preventDefault();
+		$(this).css('border', '2px solid #0B85A1');
+	});
+	$("#dragandrophandler").on('dragover', function(e){
+		e.stopPropagation();
+		e.preventDefault();
+	});
+	$("#dragandrophandler").on('drop', function(e){
+		e.preventDefault();
+		var files = e.originalEvent.dataTransfer.files;
+		fileHandler(files[0])
+	});
+	$(document).ready(function(e) {
+        $(document).on('dragenter', function(e){
+			e.stopPropagation();
+			e.preventDefault();
+		});
+		$(document).on('dragover', function(e){
+			e.stopPropagation();
+			e.preventDefault();
+			$("#dragandrophandler").css('border', '2px dotted #0B85A1');
+		});
+		$(document).on('drop', function (e) {
+			e.stopPropagation();
+			e.preventDefault();
+		});
+    });
+	function repeatPusheen(timestamp) {
+		if (!previousTime){previousTime = timestamp;}
+		var delay = timestamp - previousTime;
+		if (delay > 120){
+			context.clearRect ( 0 , 0 , canvas.width, canvas.height);
+			var image = new Image();
+			image.src = pusheen[counter];
+			context.drawImage(image, 0, 0);
+			if (counter < 3){counter ++;}else{counter = 0;}
+			previousTime = timestamp; 
+		}
+		requestAnimationFrame(repeatPusheen);
+	}
+	requestAnimationFrame(repeatPusheen);
+</script>
+</body>
+</html>
