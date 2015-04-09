@@ -9,7 +9,7 @@
 	header('Content-Disposition: attachment; filename=data.csv'); 
 	$output = fopen('php://output', 'w'); 
 	fputcsv($output, array('imageID', 'uploadTime', 'uploaderIP', 'reCAPTCHApass', 'imageDate', 'imageTime', 'imagePath', 'EXIFmanufacturer', 'EXIFmodel', 'gpsLat', 'gpsLong', 'gpsAlt', 'gpsTimestamp', 'restaurantName', 'address', 'price', 'numWonton', 'rating')); 
-	$result = $db->query("SELECT * FROM `upload`");
+	$result = $db->query("SELECT `imageID`, `uploadTime`, `uploaderIP`, `reCAPTCHApass`, `imageDate`, `imageTime`, `imagePath`, `EXIFmanufacturer`, `EXIFmodel`, `gpsLat`, `gpsLong`, `gpsAlt`, `gpsTimestamp`, `restaurantName`, `address`, `price`, `numWonton`, `rating` FROM `upload`");
 	while ($row = $result->fetch_array(MYSQLI_NUM)){
 		fputcsv($output, $row);
 	}

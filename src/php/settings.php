@@ -1,6 +1,6 @@
 <?php
 	$dbName = "YourDBName";
-	$dbUsername = "YourDBUsername";
-	$dbPassword = "YourDBPassword";
-	$reCAPTCHA_key = "YourKey";
+	$dbUsername = "YourUsername";
+	$dbPassword = "YourPassword";
+	$reCAPTCHA_key = "YourreCAPTCHAKey";
 ?>
